@@ -5,7 +5,12 @@
 #include <unistd.h> // for sleep
 
 int main() {
-    prm_window_resolution_t res = PRM_PRESET_RES_RETRO;
+  prm_window_resolution_t res = {
+    .width = 155,
+    .height = 30,
+    .scale_x = 1,
+    .scale_y = 1
+  };
     prm_window_config_t cfg = {
         .width = res.width,          // logical width
         .height = res.height,         // logical height
@@ -13,13 +18,15 @@ int main() {
         .scale_y = res.scale_y,
         .title = "PRM CPU Test",
         .backend_type = PRM_BACKEND_OPENGL_ES,
-        .usage_type = PRM_CPU,
+        .usage_type = PRM_GPU,
     };
 
     if (prm_init(&cfg) != 0) {
         printf("Failed to initialize PRM!\n");
         return -1;
     }
+
+    prm_set_resolution(&res);
     
     int height = cfg.height;
     int width = cfg.width;
@@ -27,21 +34,25 @@ int main() {
     // clear framebuffer
     prm_clear();
 
-    // draw a simple triangle
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            // simple triangle math
-            if (y > height/4 && y < 3*height/4 && 
-                x > width/4 && x < 3*width/4 && 
-                y < (2*x) - width/2 && 
-                y < (-2*x) + 3*width) {
+    // animation
+    int x = 20;
+    int y = 5;
+    int z = 0;
 
-                prm_draw_pixel(x, y, 0xFF0000FF);
-            }
-        }
+    for (;;) {
+    	// draw something simple
+    	for (int l1;l1 < 25;l1++) {
+		prm_draw_pixel(x, y, 0xFFFFFFFF);
+		y++;
+	}
+	y = 0;
+	x = 30;
+	for (int l2;l2 < 25;l2++) {
+		prm_draw_pixel(x, y, 0xFFFFFFFF);
+		y++;
+	}
+	prm_present();
     }
-    prm_draw_pixel(1, 1, 0x00FF00FF);
-    prm_present();
 
     prm_shutdown();
     return 0;
